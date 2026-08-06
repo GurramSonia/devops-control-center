@@ -10,7 +10,20 @@ pod_data = [
             "namespace":"default",
             "status":"failed",
             "restarts":1
-        }
+        },
+         {
+            "name":"mysql",
+            "namespace":"database",
+            "status":"failed",
+            "restarts":4
+        },
+
+        {
+                    "name":"mongodb",
+                    "namespace":"database",
+                    "status":"failed",
+                    "restarts":4
+        },
     ]
 def get_pod_data():
     return pod_data
