@@ -35,7 +35,6 @@ export default function PodsTable( { data, onRestart, restartingPod }: PodsTable
                             <StatusBadge
                                 podName={pod.name}
                                 status={pod.status}
-                                restartingPod={restartingPod}
                             />
                             </td>
                             <td>{pod.restarts}</td>

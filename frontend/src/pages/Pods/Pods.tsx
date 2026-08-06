@@ -115,9 +115,9 @@ function Pods(){
 
     return(
     <>
-         (toast&&
-        <Toast message={toast} />
-         )
+        {toast && (
+    <Toast message={toast} />
+)}
          <p>This is the Pods page</p>
     <div className="pods-controls">
         <button className="refresh-btn" onClick={handleRefresh}>🔄 Refresh</button>
