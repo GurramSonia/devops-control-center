@@ -1,0 +1,35 @@
+/* .status-card {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 16px;
+    margin: 8px;
+    text-align: center;
+    background-color: #f9f9f9;
+    flex: 1;
+} */
+
+.status-card{
+    width:220px;
+    padding:20px;
+
+    border-radius:12px;
+
+    background:white;
+
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+
+    text-align:center;
+}
+
+.status-card h3{
+    margin-bottom:15px;
+}
+
+.status-card p{
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    color:#2563eb;
+}
