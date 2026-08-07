@@ -6,3 +6,5 @@ class DeploymentResponse(BaseModel):
     replicas: int
     availableReplicas: int
     status: str
+class ScaleRequest(BaseModel):
+    newReplicas: int

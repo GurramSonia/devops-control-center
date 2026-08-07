@@ -5,6 +5,7 @@ from routers.pod import router1 as pod_get_router
 from routers.pod import router2 as pod_restart_router  
 from routers.deployment import router1 as deployment_router
 from routers.deployment import router2 as deployment_restart_router
+from routers.deployment import router3 as Scale_deployment_router
 
 
 app = FastAPI()
@@ -22,6 +23,7 @@ app.include_router(pod_get_router)
 app.include_router(pod_restart_router)
 app.include_router(deployment_router)
 app.include_router(deployment_restart_router)
+app.include_router(Scale_deployment_router)
 
 @app.get("/")
 def home():

@@ -2,7 +2,7 @@ import StatusCard from "../../components/StatusCard/StatusCard";
 import "./Dashboard.css";
 import DeploymentTable from "../../components/DeploymentTable/DeploymentTable";
 import useDashboard from "../../hooks/useDashboard";
-
+import useDeployments from "../../hooks/useDeployment";
 
 function Dashboard(){
     const {
@@ -10,10 +10,13 @@ function Dashboard(){
     loading,
     error,
    } = useDashboard();
+  const { deploymentData } = useDeployments();
+  const noopAsync = async (_name?: string): Promise<void> => {};
 
     if (dashboardData === null) {
         return <h2>Loading Dashboard...</h2>;
             };
+    const previewDeployments = deploymentData ? deploymentData.slice(0, 5) : [];
     return(
         <>
         <p>This is the Dashboard page</p>
@@ -30,7 +33,10 @@ function Dashboard(){
 
         </div>
         <div>
-            <DeploymentTable />
+          <DeploymentTable
+          data={previewDeployments}
+          showActions={false}
+        />
         </div>
         </>
     );

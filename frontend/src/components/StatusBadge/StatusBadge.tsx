@@ -2,8 +2,9 @@ import "./StatusBadge.css";
 
 
 type StatusBadgeProps = {
+    resourceName: string;
     status: string;
-    podName: string;
+    
 };
 
 function StatusBadge(props:StatusBadgeProps) {

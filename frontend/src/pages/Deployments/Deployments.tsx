@@ -7,6 +7,7 @@ import "../../components/Toast/Toast.css";
 import Toast from "../../components/Toast/Toast";
 import DeploymentsFilterBar from "../../components/DeploymentsFilterBar/DeploymentsFilterBar";
 import { restartDeployment} from "../../services/deploymentService";
+import { scaleDeployment } from "../../services/deploymentService";
 
 function Deployments(){
     const {deploymentData,loading,error,refreshDeployments}= useDeployments
@@ -83,10 +84,10 @@ function Deployments(){
     }, [deploymentData, searchText, selectedNamespace,selectedStatus,sortData]);
 
 
-    const handleRestart = async (deploymentName: string,action: string) => {
+    const handleRestart = async (deploymentName: string) => {
         setRestartingDeployment(deploymentName);
         try {
-          await restartDeployment(deploymentName,action);
+          await restartDeployment(deploymentName);
           await refreshDeployments();
           setToast(`Restarted ${deploymentName} successfully`);
         } catch (err) {
@@ -104,6 +105,16 @@ function Deployments(){
     if (error) {
         return <h2>{error}</h2>;
     }
+  const handleScale = async (deploymentName: string, newReplicas: number) => {
+  try {
+    await scaleDeployment(deploymentName, newReplicas);
+    await refreshDeployments();
+    setToast(`Scaled ${deploymentName} → ${newReplicas}`);
+  } catch (err) {
+    console.error(err);
+    setToast("Scale failed");
+  }
+};
 
 
     const totalDeployments= deploymentData.length;
@@ -160,7 +171,7 @@ function Deployments(){
 
     <div>
         <h3>{deploymentCountLabel}</h3>
-            <DeploymentsTable data={filteredDeployments} onRestart={handleRestart} restartingDeployment={restartingDeployment} />
+            <DeploymentsTable data={filteredDeployments}  showActions={true} onRestart={handleRestart} onScale={handleScale} restartingDeployment={restartingDeployment} />
     </div>
     </>
     );
