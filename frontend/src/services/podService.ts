@@ -4,9 +4,15 @@ import type { podData } from "../types/pod";
 export async function getPodData(): Promise<podData[]> {
     const response = await fetch("http://127.0.0.1:8001/pods");
 
-    if (!response.ok) {
-        throw new Error("Failed to fetch poddata");
-    }
+   if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const message =
+      body?.detail ||
+      (await response.text()) ||
+      "Failed to fetch pod data";
+    throw new Error(message);
+  }
+
 
     return response.json();
 }

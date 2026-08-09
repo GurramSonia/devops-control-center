@@ -13,9 +13,12 @@ function Dashboard(){
   const { deploymentData } = useDeployments();
   const noopAsync = async (_name?: string): Promise<void> => {};
 
-    if (dashboardData === null) {
-        return <h2>Loading Dashboard...</h2>;
-            };
+    // if (dashboardData === null) {
+    //     return <h2>Loading Dashboard...</h2>;
+    //         };
+    if (loading && !dashboardData) return <h2>Loading Dashboard Data...</h2>;
+    if (error) return <h2>{error}</h2>;
+    if (!dashboardData) return <h2>No Dashboard data</h2>;  
     const previewDeployments = deploymentData ? deploymentData.slice(0, 5) : [];
     return(
         <>

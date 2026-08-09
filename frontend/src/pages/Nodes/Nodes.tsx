@@ -42,13 +42,9 @@ function Nodes() {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  if (loading || nodeData === null) {
-    return <h2>Loading Nodes...</h2>;
-  }
-
-  if (error) {
-    return <h2>{error}</h2>;
-  }
+    if (loading) return <h2>Loading Nodes...</h2>;
+    if (error) return <h2>{error}</h2>;
+    if (!nodeData) return <h2>No Node data</h2>;  
 
   const statuses = Array.from(new Set(nodeData.map((node) => node.status)));
 

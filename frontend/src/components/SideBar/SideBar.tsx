@@ -12,6 +12,10 @@ function SideBar(){
         </Link>
         <p></p>
         <Link to="/deployments">Deployments| 
+        </Link>
+        <p></p>
+        <Link to="/nodes">Nodes| 
+
         </Link></>
     );
 }

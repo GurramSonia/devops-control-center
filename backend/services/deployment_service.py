@@ -1,70 +1,8 @@
-# deployment_data=[
-#   {
-#     "name": "frontend",
-#     "namespace": "default",
-#     "replicas": 3,
-#     "availableReplicas": 3,
-#     "status": "Running"
-#   },
-#   {
-#     "name": "backend",
-#     "namespace": "default",
-#     "replicas": 2,
-#     "availableReplicas": 2,
-#     "status": "Running"
-#   },
-#   {
-#     "name": "redis",
-#     "namespace": "cache",
-#     "replicas": 1,
-#     "availableReplicas": 1,
-#     "status": "Running"
-#   }
-# ]
-# def get_deployment_data():
-#     return deployment_data
-# def restart_deployment_service(deployment_name: str):
-#         return {"message": f"Restart requested for {deployment_name}"}
-    
-# def scale_replicas_service(deployment_name:str,replicas: int):
-#     for d in deployment_data:
-#         if d["name"] == deployment_name:
-#             d["replicas"] = replicas
-#             d["availableReplicas"] = min(d.get("availableReplicas", 0), replicas)
-#             break
-#     return {"message": "Scaled successfully", "replicas": replicas}
-
-
-
 from typing import List, Dict, Optional
 from kubernetes.client.rest import ApiException
 from kubernetes_folder.kubernetes_client import get_k8s_clients
 from datetime import datetime
-
-# fallback static data
-deployment_data = [
-    {
-        "name": "frontend",
-        "namespace": "default",
-        "replicas": 3,
-        "availableReplicas": 3,
-        "status": "Running",
-    },
-    {
-        "name": "backend",
-        "namespace": "default",
-        "replicas": 2,
-        "availableReplicas": 2,
-        "status": "Running",
-    },
-    {
-        "name": "redis",
-        "namespace": "cache",
-        "replicas": 1,
-        "availableReplicas": 1,
-        "status": "Running",
-    },
-]
+from fastapi import HTTPException
 
 # init k8s clients (will use provided kubeconfig path)
 try:
@@ -101,7 +39,7 @@ def get_deployment_data(namespace: Optional[str] = None) -> List[Dict]:
     Falls back to static `deployment_data` if cluster access fails.
     """
     if not _clients:
-        return deployment_data
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
 
     try:
         apps = _clients["apps_v1"]
@@ -112,10 +50,10 @@ def get_deployment_data(namespace: Optional[str] = None) -> List[Dict]:
         return [_map_deployment(d) for d in resp.items]
     except ApiException as e:
         print("Kubernetes API error when listing deployments:", e)
-        return deployment_data
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
     except Exception as e:
         print("Unexpected error when listing deployments:", e)
-        return deployment_data
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 def restart_deployment_service(deployment_name: str) -> Dict:
@@ -165,13 +103,7 @@ def scale_replicas_service(deployment_name: str, replicas: int) -> Optional[Dict
         return {"error": "replicas must be non-negative"}
 
     if not _clients:
-        # update fallback data
-        for d in deployment_data:
-            if d["name"] == deployment_name:
-                d["replicas"] = replicas
-                d["availableReplicas"] = min(d.get("availableReplicas", 0), replicas)
-                break
-        return {"message": "Scaled (fallback)", "replicas": replicas}
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
 
     try:
         apps = _clients["apps_v1"]

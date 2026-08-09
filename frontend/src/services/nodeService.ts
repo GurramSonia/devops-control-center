@@ -4,7 +4,12 @@ export async function getNodeData(): Promise<nodeData[]> {
   const response = await fetch("http://127.0.0.1:8001/nodes");
 
   if (!response.ok) {
-    throw new Error("Failed to fetch node data");
+    const body = await response.json().catch(() => null);
+    const message =
+      body?.detail ||
+      (await response.text()) ||
+      "Failed to fetch node data";
+    throw new Error(message);
   }
 
   return response.json();

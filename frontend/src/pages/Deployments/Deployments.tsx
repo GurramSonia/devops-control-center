@@ -97,14 +97,11 @@ function Deployments(){
           setRestartingDeployment(null);
         }
       };
-    if (loading || deploymentData === null) {
-        return <h2>Loading Deployments
-        ...</h2>;
-    }
 
-    if (error) {
-        return <h2>{error}</h2>;
-    }
+     if (loading && !deploymentData) return <h2>Loading Deployment...</h2>;
+    if (error) return <h2>{error}</h2>;
+    if (!deploymentData) return <h2>No deployment data</h2>;  
+
   const handleScale = async (deploymentName: string, newReplicas: number) => {
   try {
     await scaleDeployment(deploymentName, newReplicas);

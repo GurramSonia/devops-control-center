@@ -4,9 +4,14 @@ import type { deploymentData } from "../types/deployment";
 export async function getDeploymentData(): Promise<deploymentData[]> {
     const response = await fetch("http://127.0.0.1:8001/deployments");
 
-    if (!response.ok) {
-        throw new Error("Failed to fetch Deployment data");
-    }
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const message =
+      body?.detail ||
+      (await response.text()) ||
+      "Failed to fetch deployment data";
+    throw new Error(message);
+  }
 
     return response.json();
 }

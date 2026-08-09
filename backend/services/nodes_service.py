@@ -1,17 +1,8 @@
 from typing import List, Dict
 from kubernetes_folder.kubernetes_client import get_k8s_clients
 from kubernetes.client.rest import ApiException
+from fastapi import HTTPException
 
-_fallback_node_data = [
-    {
-        "name": "minikube",
-        "status": "ready",
-        "roles": "control-plane",
-        "cpu": "1",
-        "memory": "1024Mi",
-        "version": "v1.26.0",
-    }
-]
 
 try:
     _clients = get_k8s_clients(r"C:\Users\sonia\.kube\config")
@@ -64,7 +55,7 @@ def _map_node(node) -> Dict:
 
 def get_node_data() -> List[Dict]:
     if not _clients:
-        return _fallback_node_data
+         raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
 
     try:
         core = _clients["core_v1"]
@@ -72,7 +63,7 @@ def get_node_data() -> List[Dict]:
         return [_map_node(node) for node in node_list]
     except ApiException as e:
         print("Kubernetes API error when listing nodes:", e)
-        return _fallback_node_data
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
     except Exception as e:
         print("Unexpected error when listing nodes:", e)
-        return _fallback_node_data
+        raise HTTPException(status_code=500, detail=str(e))

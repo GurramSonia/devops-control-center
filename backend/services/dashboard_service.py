@@ -1,26 +1,8 @@
-# def get_dashboard_data():
-#     return {
-#         "clusterStatus": "Healthy",
-#         "runningPods": 25,
-#         "failedPods": 1,
-#         "deployments": 12,
-#         "cpuUsage": 63,
-#         "memoryUsage": 54,
-#     }
-
-
 from typing import Dict
 from kubernetes.client.rest import ApiException
 from kubernetes_folder.kubernetes_client import get_k8s_clients
+from fastapi import HTTPException
 
-_dashboard_fallback = {
-    "clusterStatus": "Healthy",
-    "runningPods": 25,
-    "failedPods": 1,
-    "deployments": 12,
-    "cpuUsage": 63,
-    "memoryUsage": 54,
-}
 
 try:
     _clients = get_k8s_clients(r"C:\Users\sonia\.kube\config")
@@ -56,7 +38,8 @@ def _estimate_memory_usage(running_pods: int, total_pods: int) -> int:
 
 def get_dashboard_data() -> Dict[str, object]:
     if not _clients:
-        return _dashboard_fallback
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
+       
 
     try:
         core = _clients["core_v1"]
@@ -78,7 +61,9 @@ def get_dashboard_data() -> Dict[str, object]:
         }
     except ApiException as e:
         print("Kubernetes API error when building dashboard:", e)
-        return _dashboard_fallback
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
     except Exception as e:
         print("Unexpected error when building dashboard:", e)
-        return _dashboard_fallback
+        raise HTTPException(status_code=500, detail=str(e))
+        
+        

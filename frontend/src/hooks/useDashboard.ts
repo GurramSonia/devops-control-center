@@ -1,28 +1,33 @@
-import { useState,useEffect } from "react";
+import { useState,useEffect,useCallback } from "react";
 import type { DashboardData } from "../types/dashboard";
 import { getDashboardData } from "../services/dashboardService";
 function useDashboard() {
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+     const [refreshing, setRefreshing] = useState(false);
 
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async (useLoading = true) => {
             try {
-                setLoading(true);
                 const data = await getDashboardData();
+                if (useLoading) setLoading(true);
+                else setRefreshing(true);
                 setDashboardData(data);
+                setError(null);
             } catch (err) {
-                setError("Failed to fetch dashboard data");
+                setError(err instanceof Error ? err.message : "Failed to fetch DashBoard data");
             } finally {
-                setLoading(false);
+                 if (useLoading) setLoading(false);
+                else setRefreshing(false);
             }
-    };
+    },[]);
         
     useEffect(() => {
     fetchDashboardData();
-    }, []);
+    }, [fetchDashboardData]);
+const refreshDashboard = () => fetchDashboardData(false);
 
-return { dashboardData, loading, error };
+return { dashboardData, loading, error,refreshDashboard,refreshing };
 }
 export default useDashboard;

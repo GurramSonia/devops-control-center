@@ -124,14 +124,10 @@ function Pods(){
     }
   };
 
-    if (loading || podData === null) {
-        return <h2>Loading Pods...</h2>;
-    }
 
-    if (error) {
-        return <h2>{error}</h2>;
-    }
-
+    if (loading && !podData) return <h2>Loading Pods...</h2>;
+    if (error) return <h2>{error}</h2>;
+    if (!podData) return <h2>No pod data</h2>;  
 
     const totalPods = podData.length;
     const isFiltered =

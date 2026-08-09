@@ -1,59 +1,9 @@
-
-# pod_data = [
-#         {
-#             "name":"frontend",
-#             "namespace":"default",
-#             "status":"pending",
-#             "restarts":0
-#         },
-#         {
-#             "name":"backend",
-#             "namespace":"default",
-#             "status":"failed",
-#             "restarts":1
-#         },
-#          {
-#             "name":"mysql",
-#             "namespace":"database",
-#             "status":"failed",
-#             "restarts":4
-#         },
-
-#         {
-#                     "name":"mongodb",
-#                     "namespace":"database",
-#                     "status":"failed",
-#                     "restarts":4
-#         },
-#     ]
-# def get_pod_data():
-#     return pod_data
-
-# def restart_pod_service(pod_name: str):
-#     for pod in pod_data:
-#         if pod["name"] == pod_name:
-#             print(f"Restarting pod: {pod_name}")
-#             pod["status"] = "pending" or "failed"
-#             pod["restarts"] += 1
-#             break
-#     return {"message": f"Restart requested for {pod_name}"}
-
-
-
-
-
 from kubernetes_folder.kubernetes_client import get_k8s_clients
 from typing import List, Dict, Optional
 from kubernetes.client.rest import ApiException
 from fastapi import HTTPException
 
-# keep a small local fallback for when K8s can't be reached
-_fallback_pod_data = [
-    {"name": "frontend", "namespace": "default", "status": "pending", "restarts": 0},
-    {"name": "backend", "namespace": "default", "status": "failed", "restarts": 1},
-    {"name": "mysql", "namespace": "database", "status": "failed", "restarts": 4},
-    {"name": "mongodb", "namespace": "database", "status": "failed", "restarts": 4},
-]
+
 
 # initialize clients once; get_k8s_clients should handle kubeconfig/in-cluster config
 try:
@@ -79,8 +29,8 @@ def get_pod_data(namespace: Optional[str] = None) -> List[Dict]:
     Falls back to static data if K8s is unreachable.
     """
     if not _clients:
-        return _fallback_pod_data
-        #raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
+        #return _fallback_pod_data
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
 
     try:
         core = _clients["core_v1"]
@@ -91,10 +41,10 @@ def get_pod_data(namespace: Optional[str] = None) -> List[Dict]:
         return [_map_pod(p) for p in pod_list.items]
     except ApiException as e:
         print("Kubernetes API error when listing pods:", e)
-        return _fallback_pod_data
+        raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
     except Exception as e:
         print("Unexpected error when listing pods:", e)
-        return _fallback_pod_data
+        raise HTTPException(status_code=500, detail=str(e))
 
 def restart_pod_service(pod_name: str) -> Dict:
     """
@@ -103,12 +53,7 @@ def restart_pod_service(pod_name: str) -> Dict:
     """
     # fallback behavior for static data (keeps old interface)
     if not _clients:
-        for pod in _fallback_pod_data:
-            if pod["name"] == pod_name:
-                pod["status"] = "pending"
-                pod["restarts"] += 1
-                break
-        return {"message": f"Restart requested for {pod_name}"}
+          raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
 
     try:
         core = _clients["core_v1"]
