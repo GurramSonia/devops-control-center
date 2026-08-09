@@ -6,6 +6,7 @@ import Settings from './pages/Settings/Settings'
 import Deployments from './pages/Deployments/Deployments'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import DashBoardLayout from './components/Layouts/DashBoardLayout'
+import Nodes from "./pages/Nodes/Nodes";
 
 
 function App() {
@@ -18,6 +19,14 @@ function App() {
     <SideBar /> */}
     
       <Routes>
+        <Route
+      path="/nodes"
+      element={
+    <DashBoardLayout>
+      <Nodes />
+    </DashBoardLayout>
+  }
+/>
         <Route path="/" element={<Login />} />
 
         <Route path="/dashboard" 

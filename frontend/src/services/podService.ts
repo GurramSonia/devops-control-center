@@ -27,3 +27,22 @@ export async function restartPod(name: string) {
 
   return response.json();
 }
+
+
+export async function getPodLogs(
+  podName: string,
+  namespace: string
+): Promise<string> {
+  const response = await fetch(
+    `http://127.0.0.1:8001/pods/${encodeURIComponent(
+      podName
+    )}/logs?namespace=${encodeURIComponent(namespace)}`
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(body || "Failed to fetch pod logs");
+  }
+
+  return response.text();
+}

@@ -3,9 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers.dashboard import router as dashboard_router
 from routers.pod import router1 as pod_get_router
 from routers.pod import router2 as pod_restart_router  
+from routers.pod import router3 as pod_logs_router
 from routers.deployment import router1 as deployment_router
 from routers.deployment import router2 as deployment_restart_router
 from routers.deployment import router3 as Scale_deployment_router
+from routers.node import router as node_router
+
 
 
 app = FastAPI()
@@ -24,6 +27,8 @@ app.include_router(pod_restart_router)
 app.include_router(deployment_router)
 app.include_router(deployment_restart_router)
 app.include_router(Scale_deployment_router)
+app.include_router(pod_logs_router)
+app.include_router(node_router)
 
 @app.get("/")
 def home():

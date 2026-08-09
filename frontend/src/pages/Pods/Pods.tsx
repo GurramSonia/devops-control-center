@@ -1,13 +1,21 @@
 import  { useMemo, useState,useEffect } from "react";
 import usePods from "../../hooks/usePods";
+import type { podData } from "../../types/pod";
 
-import { restartPod } from "../../services/podService";
+import { restartPod,getPodLogs } from "../../services/podService";
 import PodsTable from "../../components/PodsTable/PodsTable";
 import "../../components/Toast/Toast.css";
 import Toast from "../../components/Toast/Toast";
 import PodsFilterBar from "../../components/PodsFilterBar/PodsFilterBar";
-
+import PodLogsModal from "../../components/PodsLogsModal/PodsLogsModal";
 function Pods(){
+
+    const [selectedPod, setSelectedPod] = useState<podData | null>(null);
+    const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
+    const [podLogs, setPodLogs] = useState<string | null>(null);
+    const [logsLoading, setLogsLoading] = useState(false);
+    const [logsError, setLogsError] = useState<string | null>(null);
+
     const [restartingPod, setRestartingPod] = useState<string | null>(null);
     const {podData,loading,error,refreshPods}= usePods();
     const [searchText, setSearchText] = useState("");
@@ -16,6 +24,27 @@ function Pods(){
     const[sortData,setSortData]=useState("a-z");
     const [toast, setToast] = useState<string | null>(null);
     const [autoRefresh, setAutoRefresh] = useState(true);
+
+   const handleViewLogs = async (pod: podData) => {
+        setSelectedPod(pod);
+        setLogsLoading(true);
+        setLogsError(null);
+
+  try {
+    const logs = await getPodLogs(pod.name,pod.namespace); // implement in podService
+    setPodLogs(logs);
+    setIsLogsModalOpen(true);
+  } catch (err) {
+    setLogsError("Failed to load pod logs");
+  } finally {
+    setLogsLoading(false);
+  }
+};
+
+  const handleCloseLogsModal = () => {
+    setSelectedPod(null);
+    setIsLogsModalOpen(false);
+  };
 
     const handleRefresh = async () => {
     await refreshPods();
@@ -150,8 +179,19 @@ function Pods(){
 
     <div>
         <h3>{podCountLabel}</h3>
-            <PodsTable data={filteredPods} onRestart={handleRestart} restartingPod={restartingPod} />
+            <PodsTable data={filteredPods} onRestart={handleRestart} restartingPod={restartingPod} onViewLogs={handleViewLogs} />
     </div>
+
+      {isLogsModalOpen && selectedPod && (
+        <PodLogsModal
+           pod={selectedPod}
+            logs={podLogs}
+            loading={logsLoading}
+            error={logsError}
+            onClose={handleCloseLogsModal}
+        />
+      )}
+
     </>
     );
 }

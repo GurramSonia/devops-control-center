@@ -45,6 +45,7 @@
 from kubernetes_folder.kubernetes_client import get_k8s_clients
 from typing import List, Dict, Optional
 from kubernetes.client.rest import ApiException
+from fastapi import HTTPException
 
 # keep a small local fallback for when K8s can't be reached
 _fallback_pod_data = [
@@ -79,6 +80,7 @@ def get_pod_data(namespace: Optional[str] = None) -> List[Dict]:
     """
     if not _clients:
         return _fallback_pod_data
+        #raise HTTPException(status_code=503, detail="Kubernetes connection unavailable")
 
     try:
         core = _clients["core_v1"]
@@ -125,3 +127,29 @@ def restart_pod_service(pod_name: str) -> Dict:
     except Exception as e:
         print("Unexpected error when restarting pod:", e)
         return {"error": str(e)}
+
+
+def get_pod_logs_service(pod_name: str, namespace: str) -> str:
+    if not _clients:
+        return f"Fallback logs for {pod_name} in namespace {namespace}"
+
+    try:
+        core = _clients["core_v1"]
+        return core.read_namespaced_pod_log(
+            name=pod_name,
+            namespace=namespace,
+            tail_lines=200,
+            timestamps=True,
+        )
+    
+    except ApiException as e:
+        if getattr(e, "status", None) == 404:
+            return ""
+        raise HTTPException(
+            status_code=e.status if getattr(e, "status", None) else 500,
+            detail=str(e),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+

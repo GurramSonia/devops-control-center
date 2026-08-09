@@ -5,9 +5,10 @@ type PodsTableProps = {
   data: podData[];
   onRestart: (name: string) => Promise<void>;
   restartingPod: string | null;
+  onViewLogs: (pod: podData) => void;
 };
 
-export default function PodsTable( { data, onRestart, restartingPod }: PodsTableProps ) {
+export default function PodsTable( { data, onRestart, restartingPod,  onViewLogs }: PodsTableProps ) {
     if (!data || data.length === 0) {
         return <div>No pods available</div>;
     }
@@ -33,7 +34,7 @@ export default function PodsTable( { data, onRestart, restartingPod }: PodsTable
                             {/* <td>{pod.status}</td> */}
                             <td>
                             <StatusBadge
-                                podName={pod.name}
+                                resourceName={pod.name}
                                 status={pod.status}
                             />
                             </td>
@@ -45,6 +46,7 @@ export default function PodsTable( { data, onRestart, restartingPod }: PodsTable
                         >
                         {restartingPod === pod.name ? "Restarting..." : "Restart"}
               </button>
+               <button onClick={() => onViewLogs(pod)}>Logs</button>
             </td>
                         </tr>
                     ))}
