@@ -36,12 +36,10 @@ export default function DeploymentsTable( { data,showActions = false,onRestart,o
                             {/* <td>{deployment.status}</td> */}
                             <td>{deployment.replicas}</td>
                             <td>{deployment.availableReplicas}</td>
-                            <td>
                             <StatusBadge
                                 resourceName={deployment.name}
                                 status={deployment.status}
                             />
-                            </td>
                              
                         {showActions && (
                             <td>

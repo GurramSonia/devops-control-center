@@ -1,12 +1,7 @@
 import type { nodeData } from "../types/node";
 
 export async function getNodeData(): Promise<nodeData[]> {
-  const token = localStorage.getItem("token");
-  const response = await fetch("http://127.0.0.1:8001/nodes", {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+  const response = await fetch("http://127.0.0.1:8001/nodes");
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);

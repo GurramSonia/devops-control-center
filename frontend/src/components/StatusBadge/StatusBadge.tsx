@@ -11,9 +11,9 @@ function StatusBadge(props:StatusBadgeProps) {
     const normalizedStatus = props.status.toLowerCase().replace(/\s+/g, "-");
     const className = `status-badge status-badge--${normalizedStatus}`;
     return(
-        <div className={className}> 
-            <p>{props.status}</p>
-        </div>
+        <span className={className}> 
+            <span>{props.status}</span>
+        </span>
     )
 }
 export default StatusBadge;
