@@ -2,7 +2,12 @@ import type { podData } from "../types/pod";
 
 
 export async function getPodData(): Promise<podData[]> {
-    const response = await fetch("http://127.0.0.1:8001/pods");
+   const token = localStorage.getItem("token");
+    const response = await fetch("http://127.0.0.1:8001/pods", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
 
    if (!response.ok) {
     const body = await response.json().catch(() => null);
