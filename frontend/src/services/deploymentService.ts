@@ -2,7 +2,12 @@ import type { deploymentData } from "../types/deployment";
 
 
 export async function getDeploymentData(): Promise<deploymentData[]> {
-    const response = await fetch("http://127.0.0.1:8001/deployments");
+   const token = localStorage.getItem("token");
+    const response = await fetch("http://127.0.0.1:8001/deployments", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
