@@ -7,6 +7,7 @@ import Deployments from './pages/Deployments/Deployments'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import DashBoardLayout from './components/Layouts/DashBoardLayout'
 import Nodes from "./pages/Nodes/Nodes";
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 
 function App() {
@@ -15,19 +16,21 @@ function App() {
   return (
     <>
     <BrowserRouter>
-    {/* <NavBar />
-    <SideBar /> */}
     
-      <Routes>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
+      <Route element={<ProtectedRoute />}> 
+      
         <Route
-      path="/nodes"
-      element={
-    <DashBoardLayout>
-      <Nodes />
-    </DashBoardLayout>
-  }
-/>
-        <Route path="/" element={<Login />} />
+            path="/nodes"
+            element={
+          <DashBoardLayout>
+            <Nodes />
+          </DashBoardLayout>
+          }
+        />
+        
 
         <Route path="/dashboard" 
         element={
@@ -55,7 +58,9 @@ function App() {
           <Deployments />
         </DashBoardLayout>}
          />
-      </Routes>
+
+      </Route>
+    </Routes>
     </BrowserRouter>
 
     

@@ -1,12 +1,8 @@
 import type { DashboardData } from "../types/dashboard";
+import { apiFetch } from "./apiFetch";
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const token = localStorage.getItem("token");
-    const response = await fetch("http://127.0.0.1:8001/dashboard",{
-  headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+  const response = await apiFetch("/dashboard");
 
     if (!response.ok) {
     const body = await response.json().catch(() => null);

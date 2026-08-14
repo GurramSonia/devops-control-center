@@ -1,9 +1,10 @@
 import type { podData } from "../types/pod";
+import { apiFetch } from "./apiFetch";
 
 
 export async function getPodData(): Promise<podData[]> {
    const token = localStorage.getItem("token");
-    const response = await fetch("http://127.0.0.1:8001/pods", {
+    const response = await fetch("http://127.0.0.1:8000/pods", {
       headers: {
         "Authorization": `Bearer ${token}`
       }
@@ -23,14 +24,13 @@ export async function getPodData(): Promise<podData[]> {
 }
 
 
-export async function restartPod(name: string) {
-  const response = await fetch(`http://127.0.0.1:8001/pods/${name}/restart`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name }),
-  });
+export async function restartPod(podName: string) {
+  const response = await apiFetch(
+    `/pods/${podName}/restart`,
+    {
+      method: "POST",
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Failed to restart pod");
@@ -44,12 +44,9 @@ export async function getPodLogs(
   podName: string,
   namespace: string
 ): Promise<string> {
-  const response = await fetch(
-    `http://127.0.0.1:8001/pods/${encodeURIComponent(
-      podName
-    )}/logs?namespace=${encodeURIComponent(namespace)}`
+    const response = await apiFetch(
+    `/pods/${podName}/logs?namespace=${encodeURIComponent(namespace)}`
   );
-
   if (!response.ok) {
     const body = await response.text();
     throw new Error(body || "Failed to fetch pod logs");
@@ -57,3 +54,4 @@ export async function getPodLogs(
 
   return response.text();
 }
+
