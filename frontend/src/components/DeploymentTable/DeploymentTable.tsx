@@ -1,5 +1,6 @@
 import type { deploymentData } from "../../types/deployment";
 import StatusBadge from "../StatusBadge/StatusBadge";
+import { useAuth } from "../../context/AuthContext";
 
 type DeploymentsTableProps = {
   data: deploymentData[];
@@ -10,11 +11,14 @@ type DeploymentsTableProps = {
 };
 
 export default function DeploymentsTable( { data,showActions = false,onRestart,onScale,restartingDeployment=null }: DeploymentsTableProps ) {
+    const { role } = useAuth();
+
     if (!data || data.length === 0) {
         return <div>No deployments available</div>;
     }
+    
 
-    return (
+    return (    
         <div className="deployment-table">
             <h3>deployments Table</h3>
             <table>
@@ -25,7 +29,7 @@ export default function DeploymentsTable( { data,showActions = false,onRestart,o
                         <th>replicas</th>
                         <th>availableReplicas</th>
                         <th>status</th>
-                        {showActions && <th>Actions</th>}
+                        { role !== "viewer" && showActions &&  <th>Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -42,26 +46,31 @@ export default function DeploymentsTable( { data,showActions = false,onRestart,o
                                 status={deployment.status}
                             />
                             </td>
-                             
-                        {showActions && (
+
+                       {role !== "viewer" && showActions && (
+
                             <td>
-                                <button onClick={() => onScale?.(deployment.name, deployment.replicas + 1)}>+</button>
-                                
-                                <button
-                                onClick={() => onScale?.(deployment.name, Math.max(0, deployment.replicas - 1))}
-                                disabled={deployment.replicas <= 0}
-                                title={deployment.replicas <= 0 ? "Cannot go below 0 replicas" : "Scale down"}
-                                aria-disabled={deployment.replicas <= 0}>
-                                 -
-                                </button>
-                            <button
-                          onClick={() => onRestart?.(deployment.name)}
-                        disabled={restartingDeployment === deployment.name}
-                       >
-                        {restartingDeployment === deployment.name ? "Restarting..." : "Restart"}
-              </button> 
-            </td>
-                )}
+                             
+                                <>
+                                    
+                                    <button onClick={() => onScale?.(deployment.name, deployment.replicas + 1)}>+</button>
+                                    
+                                    <button
+                                        onClick={() => onScale?.(deployment.name, Math.max(0, deployment.replicas - 1))}
+                                        disabled={deployment.replicas <= 0}
+                                        title={deployment.replicas <= 0 ? "Cannot go below 0 replicas" : "Scale down"}
+                                        aria-disabled={deployment.replicas <= 0}>
+                                        -
+                                    </button>
+                                    <button
+                                        onClick={() => onRestart?.(deployment.name)}
+                                        disabled={restartingDeployment === deployment.name}
+                                    >
+                                        {restartingDeployment === deployment.name ? "Restarting..." : "Restart"}
+                                    </button> 
+                                    </>
+                            </td>
+                        )}
                         </tr>
                     ))}
                 </tbody>

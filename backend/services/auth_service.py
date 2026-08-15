@@ -19,12 +19,32 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 )
 
-def create_access_token(email: str) -> str:
+def login_user(db, email, password):
+
+    user = authenticate_user(
+        db,
+        email,
+        password
+    )
+
+    token = create_access_token(
+        user.email,
+        user.role
+    )
+
+    return {
+        "token": token,
+        "message": "Login successful"
+    }
+
+
+def create_access_token(email: str,role: str) -> str:
 
     now = time.time()
 
     payload = {
         "sub": email,
+        "role": role,
         "iat": now,
         "exp": now + (ACCESS_TOKEN_EXPIRE_MINUTES * 60),
     }
@@ -72,22 +92,6 @@ def authenticate_user(
 
     return user
 
-def login_user(db, email, password):
-
-    user = authenticate_user(
-        db,
-        email,
-        password
-    )
-
-    token = create_access_token(
-        user.email
-    )
-
-    return {
-        "token": token,
-        "message": "Login successful"
-    }
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
@@ -100,8 +104,9 @@ def get_current_user(
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
-
+        print("decoded payload:", payload)  # Debugging line
         email = payload.get("sub")
+        role = payload.get("role")
 
         if not email:
             raise HTTPException(
@@ -109,7 +114,10 @@ def get_current_user(
                 detail="Invalid token"
             )
 
-        return email
+        return {
+            "email": email,
+            "role": role
+        }
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(
@@ -122,3 +130,18 @@ def get_current_user(
             status_code=401,
             detail="Invalid token"
         )
+
+def require_roles(*allowed_roles: str):
+
+    def role_checker(
+        current_user: dict = Depends(get_current_user)
+    ):
+        if current_user["role"] not in allowed_roles:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to perform this action"
+            )
+
+        return current_user
+
+    return role_checker

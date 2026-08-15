@@ -1,5 +1,6 @@
 import type { podData } from "../../types/pod";
 import StatusBadge from "../StatusBadge/StatusBadge";
+import { useAuth } from "../../context/AuthContext";
 
 type PodsTableProps = {
   data: podData[];
@@ -9,9 +10,11 @@ type PodsTableProps = {
 };
 
 export default function PodsTable( { data, onRestart, restartingPod,  onViewLogs }: PodsTableProps ) {
+    const { role } = useAuth();
     if (!data || data.length === 0) {
         return <div>No pods available</div>;
     }
+    
 
     return (
         <div className="deployment-table">
@@ -40,12 +43,15 @@ export default function PodsTable( { data, onRestart, restartingPod,  onViewLogs
                             </td>
                             <td>{pod.restarts}</td>
                             <td>
+                    {role !== "viewer" && (
                         <button
                          onClick={() => onRestart(pod.name)}
                         disabled={restartingPod === pod.name}
                         >
                         {restartingPod === pod.name ? "Restarting..." : "Restart"}
               </button>
+                    )}
+
                <button onClick={() => onViewLogs(pod)}>Logs</button>
             </td>
                         </tr>

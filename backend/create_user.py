@@ -13,8 +13,8 @@ pwd_context = CryptContext(
 db = SessionLocal()
 
 try:
-    email = "sonia@example.com"
-    password = "sonia123"
+    email = "viewer@example.com"
+    password = "viewer123"
 
     existing_user = (
         db.query(User)

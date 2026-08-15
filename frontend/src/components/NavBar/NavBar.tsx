@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 
 function NavBar(){
     const { logout } = useAuth();
+    const { role } = useAuth();
     return(
         <>
         <h1>DevOps Control Center </h1>
@@ -11,6 +12,10 @@ function NavBar(){
         <button onClick={logout}>
                 Logout
         </button>
+        <p>Current role: {role}</p>
+        
+
+
     
     </>
     );
