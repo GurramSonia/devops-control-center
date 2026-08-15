@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState,useEffect } from "react";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -22,7 +22,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
   }
+   
+  
+  useEffect(() => {
+    function handleAuthExpired() {
+      localStorage.removeItem("token");
+      setIsAuthenticated(false);
+    }
 
+    window.addEventListener("auth-expired", handleAuthExpired);
+
+    return () => {
+      window.removeEventListener("auth-expired", handleAuthExpired);
+    };
+  }, []);
+  
   return (
     <AuthContext.Provider
       value={{
