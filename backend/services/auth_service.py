@@ -19,6 +19,27 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 )
 
+
+ROLE_PERMISSIONS = {
+    "admin": {
+        "view",
+        "restart_pod",
+        "restart_deployment",
+        "scale_deployment",
+    },
+
+    "developer": {
+        "view",
+        "restart_pod",
+        "restart_deployment",
+        "scale_deployment",
+    },
+
+    "viewer": {
+        "view",
+    },
+}
+
 def login_user(db, email, password):
 
     user = authenticate_user(
@@ -145,3 +166,28 @@ def require_roles(*allowed_roles: str):
         return current_user
 
     return role_checker
+
+
+def require_permission(permission: str):
+
+    def permission_checker(
+        current_user: dict = Depends(get_current_user)
+    ):
+        role = current_user["role"]
+
+        permissions = ROLE_PERMISSIONS.get(role, set())
+        print("DEBUG permission check:")
+        print("Role:", role)
+        print("Required:", permission)
+        print("Allowed:", permission in permissions)
+        print("Permissions:", permissions)
+
+        if permission not in permissions:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to perform this action"
+            )
+
+        return current_user
+
+    return permission_checker
