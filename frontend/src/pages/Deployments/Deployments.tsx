@@ -104,7 +104,19 @@ function Deployments(){
 
   const handleScale = async (deploymentName: string, newReplicas: number) => {
   try {
-    await scaleDeployment(deploymentName, newReplicas);
+    const deployment = deploymentData.find(
+            (item) => item.name === deploymentName
+        );
+
+        if (!deployment) {
+            throw new Error("Deployment not found");
+        }
+
+        await scaleDeployment(
+            deploymentName,
+            newReplicas,
+            deployment.namespace
+        );
     await refreshDeployments();
     setToast(`Scaled ${deploymentName} → ${newReplicas}`);
   } catch (err) {

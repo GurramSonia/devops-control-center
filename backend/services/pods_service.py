@@ -46,7 +46,7 @@ def get_pod_data(namespace: Optional[str] = None) -> List[Dict]:
         print("Unexpected error when listing pods:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
-def restart_pod_service(pod_name: str) -> Dict:
+def restart_pod_service(pod_name: str, namespace: str) -> Dict:
     """
     Restart a pod by locating it (across namespaces) and deleting it.
     Controller (Deployment/ReplicaSet) will recreate the pod.

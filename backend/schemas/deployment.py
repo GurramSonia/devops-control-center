@@ -7,4 +7,6 @@ class DeploymentResponse(BaseModel):
     availableReplicas: int
     status: str
 class ScaleRequest(BaseModel):
+    name: str
     newReplicas: int
+    namespace: str

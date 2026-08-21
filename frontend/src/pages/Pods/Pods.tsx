@@ -110,12 +110,12 @@ function Pods(){
     }, [podData, searchText, selectedNamespace,selectedStatus,sortData]);
 
 
-    const handleRestart = async (podName: string) => {
-    setRestartingPod(podName);
+    const handleRestart = async ( pod: podData) => {
+    setRestartingPod(pod.name);
     try {
-      await restartPod(podName);
+      await restartPod(pod.name, pod.namespace);
       await refreshPods();
-      setToast(`Restarted ${podName} successfully`);
+      setToast(`Restarted ${pod.name} successfully`);
     } catch (err) {
       console.error(err);
       setToast("Restart failed");

@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 
 type PodsTableProps = {
   data: podData[];
-  onRestart: (name: string) => Promise<void>;
+  onRestart: (pod: podData) => Promise<void>;
   restartingPod: string | null;
   onViewLogs: (pod: podData) => void;
 };
@@ -45,7 +45,7 @@ export default function PodsTable( { data, onRestart, restartingPod,  onViewLogs
                             <td>
                     {role !== "viewer" && (
                         <button
-                         onClick={() => onRestart(pod.name)}
+                         onClick={() => onRestart?.(pod)}
                         disabled={restartingPod === pod.name}
                         >
                         {restartingPod === pod.name ? "Restarting..." : "Restart"}

@@ -94,6 +94,20 @@ def restart_deployment_service(deployment_name: str) -> Dict:
         return {"error": str(e)}
 
 
+
+def get_deployment_by_name(
+    deployment_name: str,
+    namespace: str
+) -> Optional[Dict]:
+
+    deployments = get_deployment_data(namespace)
+
+    for deployment in deployments:
+        if deployment["name"] == deployment_name:
+            return deployment
+
+    return None
+
 def scale_replicas_service(deployment_name: str, replicas: int) -> Optional[Dict]:
     """
     Set the deployment's replica count to `replicas`.

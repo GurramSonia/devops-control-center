@@ -32,13 +32,15 @@ export async function restartDeployment(name: string) {
   return response.json();
 }
 
-export async function scaleDeployment(name: string, newReplicas: number) {
+export async function scaleDeployment(name: string, newReplicas: number, namespace: string) {
  const response = await apiFetch(
     `/deployments/${name}/scale`,
     {
       method: "POST",
       body: JSON.stringify({
-        replicas: newReplicas,
+        name: name,
+        newReplicas: newReplicas,
+        namespace: namespace
       }),
     }
   );

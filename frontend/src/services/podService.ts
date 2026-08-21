@@ -24,9 +24,9 @@ export async function getPodData(): Promise<podData[]> {
 }
 
 
-export async function restartPod(podName: string) {
+export async function restartPod(podName: string, namespace: string) {
   const response = await apiFetch(
-    `/pods/${podName}/restart`,
+    `/pods/${podName}/restart?namespace=${encodeURIComponent(namespace)}`,
     {
       method: "POST",
     }
